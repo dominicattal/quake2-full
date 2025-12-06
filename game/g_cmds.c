@@ -869,6 +869,14 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 	}
 }
 
+void Cmd_Cast_f(edict_t *ent)
+{
+    vec3_t dir;
+    if (ent == NULL || ent->client == NULL) return;
+    AngleVectors(ent->client->v_angle, dir, NULL, NULL);
+    fire_bfg(ent, ent->s.origin, dir, 100, 100, 25);
+}
+
 void Cmd_PlayerList_f(edict_t *ent)
 {
 	int i;
@@ -987,6 +995,8 @@ void ClientCommand (edict_t *ent)
 		Cmd_Wave_f (ent);
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
+	else if (Q_stricmp(cmd, "cast") == 0)
+		Cmd_Cast_f(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }

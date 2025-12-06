@@ -1,0 +1,6 @@
+build
+log.txt
+.env
+.vs
+*vcxproj*
+
