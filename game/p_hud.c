@@ -322,10 +322,10 @@ void HelpComputer (edict_t *ent)
 		"xv 0 yv 110 cstring2 \"%s\" "		// help 2
 		"xv 50 yv 164 string2 \" kills     goals    secrets\" "
 		"xv 50 yv 172 string2 \"%3i/%3i     %i/%i       %i/%i\" ", 
-		sk,
-		level.level_name,
-		game.helpmessage1,
-		game.helpmessage2,
+		"MOD",
+		"MAP",
+		"KILL THE ENEMIES",
+		"CLICK TO SHOOT, AIM FOR THE HEAD",
 		level.killed_monsters, level.total_monsters, 
 		level.found_goals, level.total_goals,
 		level.found_secrets, level.total_secrets);

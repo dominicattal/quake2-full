@@ -89,6 +89,29 @@ void G_RunFrame (void);
 
 //===================================================================
 
+// ============== MODDED STUFF HERE ===============
+
+struct {
+    int wave;
+    float next_wave_time; //level.time
+} ctx;
+
+void final_init(void)
+{
+    ctx.wave = 0;
+    ctx.next_wave_time = level.time;
+}
+
+void final_update(void)
+{
+    if (level.time >= ctx.next_wave_time) {
+        gi.dprintf("test");
+        ctx.next_wave_time = level.time + 60;
+    }
+}
+
+// ================================================
+
 
 void ShutdownGame (void)
 {
@@ -201,6 +224,7 @@ edict_t *CreateTargetChangeLevel(char *map)
 {
 	edict_t *ent;
 
+    final_init();
 	ent = G_Spawn ();
 	ent->classname = "target_changelevel";
 	Com_sprintf(level.nextmap, sizeof(level.nextmap), "%s", map);
@@ -357,6 +381,9 @@ void G_RunFrame (void)
 
 	level.framenum++;
 	level.time = level.framenum*FRAMETIME;
+
+    // do modded stufff
+    final_update();
 
 	// choose a client for monsters to target this frame
 	AI_SetSightClient ();

@@ -907,6 +907,12 @@ void Cmd_PlayerList_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
 
+void ED_CallSpawn (edict_t *ent);
+void Cmd_Spawn(edict_t *ent)
+{
+    ED_CallSpawn(ent);
+}
+
 
 /*
 =================
