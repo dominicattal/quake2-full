@@ -513,6 +513,16 @@ extern	edict_t			*g_edicts;
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
 
+// FINAL
+struct {
+    int started;
+    int wave;
+    float next_wave_time; //level.time
+    edict_t* player_ent;
+} final_context;
+extern void final_init(void);
+// END
+
 extern	cvar_t	*maxentities;
 extern	cvar_t	*deathmatch;
 extern	cvar_t	*coop;

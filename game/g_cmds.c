@@ -877,6 +877,34 @@ void Cmd_Cast_f(edict_t *ent)
     fire_bfg(ent, ent->s.origin, dir, 100, 100, 25);
 }
 
+void Cmd_Class_f(edict_t *ent)
+{
+    char* name;
+    vec3_t dir;
+	gitem_t* it;
+    int i;
+    if (ent == NULL || ent->client == NULL) return;
+
+	name = gi.args();
+
+    for (i=0 ; i<game.num_items ; i++)
+    {
+        it = itemlist + i;
+        if (!it->pickup)
+            continue;
+        if (!(it->flags & IT_WEAPON))
+            continue;
+        ent->client->pers.inventory[i] = 0;
+    }
+
+	if (Q_stricmp(name, "tank") == 0) {
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("chaingun"))]++;
+        //Add_Ammo(ent, FindItem("bullets"), 30);
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("bullets"))] = 60;
+    } else {
+    }
+}
+
 void Cmd_PlayerList_f(edict_t *ent)
 {
 	int i;
@@ -906,11 +934,32 @@ void Cmd_PlayerList_f(edict_t *ent)
 	}
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
+void Cmd_Pos_f(edict_t* ent)
+{
+    gi.dprintf("%f %f %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
+}
 
 void ED_CallSpawn (edict_t *ent);
 void Cmd_Spawn(edict_t *ent)
 {
     ED_CallSpawn(ent);
+}
+
+
+static float positions[] = {
+    88.25, -176.125, 24.125
+};
+
+void spawn_FFFFF(edict_t* ent)
+{
+    int n = sizeof(positions) / sizeof(positions[0]) / 3;
+    int idx = rand() % n;
+    edict_t* new_ent = G_Spawn();
+    new_ent->classname = "monster_gladiator";
+    new_ent->s.origin[0] = positions[3*idx];
+    new_ent->s.origin[1] = positions[3*idx+1];
+    new_ent->s.origin[2] = positions[3*idx+2];
+    ED_CallSpawn(new_ent);
 }
 
 
@@ -1003,6 +1052,12 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "cast") == 0)
 		Cmd_Cast_f(ent);
+    else if (Q_stricmp(cmd, "class") == 0)
+        Cmd_Class_f(ent);
+    else if (Q_stricmp(cmd, "pos") == 0)
+        Cmd_Pos_f(ent);
+    else if (Q_stricmp(cmd, "spawn") == 0)
+        spawn_FFFFF(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }

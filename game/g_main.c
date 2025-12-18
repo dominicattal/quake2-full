@@ -91,22 +91,35 @@ void G_RunFrame (void);
 
 // ============== MODDED STUFF HERE ===============
 
-struct {
-    int wave;
-    float next_wave_time; //level.time
-} ctx;
+static float positions[] = {
+    88.25, -176.125, 24.125
+};
+
+void spawn(void)
+{
+    int n = sizeof(positions) / sizeof(positions[0]) / 3;
+    int idx = rand() % n;
+    edict_t* new_ent = G_Spawn();
+    new_ent->classname = "monster_gladiator";
+    new_ent->s.origin[0] = positions[3*idx];
+    new_ent->s.origin[1] = positions[3*idx+1];
+    new_ent->s.origin[2] = positions[3*idx+2];
+    ED_CallSpawn(new_ent);
+}
 
 void final_init(void)
 {
-    ctx.wave = 0;
-    ctx.next_wave_time = level.time;
+    final_context.wave = 0;
+    final_context.next_wave_time = level.time;
+    final_context.started = 1;
 }
 
 void final_update(void)
 {
-    if (level.time >= ctx.next_wave_time) {
-        gi.dprintf("test");
-        ctx.next_wave_time = level.time + 60;
+    if (!final_context.started) return;
+    if (level.time >= final_context.next_wave_time) {
+        spawn();
+        final_context.next_wave_time = level.time + 5;
     }
 }
 

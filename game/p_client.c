@@ -1180,6 +1180,8 @@ void PutClientInServer (edict_t *ent)
 	ent->flags &= ~FL_NO_KNOCKBACK;
 	ent->svflags &= ~SVF_DEADMONSTER;
 
+    final_context.player_ent = ent;
+
 	VectorCopy (mins, ent->mins);
 	VectorCopy (maxs, ent->maxs);
 	VectorClear (ent->velocity);
@@ -1347,6 +1349,8 @@ void ClientBegin (edict_t *ent)
 
 	// make sure all view stuff is valid
 	ClientEndServerFrame (ent);
+
+    final_init();
 }
 
 /*
