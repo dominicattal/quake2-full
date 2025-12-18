@@ -91,26 +91,96 @@ void G_RunFrame (void);
 
 // ============== MODDED STUFF HERE ===============
 
-static float positions[] = {
-    88.25, -176.125, 24.125
+static char* weak_enemies[] = {
+    "monster_infantry",
+    "monster_soldier"
 };
+
+static char* avg_enemies[] = {
+    "monster_gunner",
+    "monster_tank"
+};
+
+static char* strong_enemies[] = {
+    "monster_gladiator",
+    "monster_mutant"
+};
+
+static char* boss_enemies[] = {
+    "monster_boss2"
+    "monster_flyer"
+};
+
+static float positions[] = {
+    631.25, 682.00, 536.125,
+    305.00, 168.25, 664.125,
+    721.75, 775.50, 782.125,
+    627.12, 1340.25, 792.125,
+    573.25, 696.25, 792.125,
+    240.625, -51, 664.125,
+    958.50, -170, 664.125,
+    673.875, 264, 536.125,
+    2030, 375, 712, 408.125,
+    325.125, 1002.125, 664.125,
+    506.25, 849.125, 920.125,
+    850.125, -50.37, 920.125,
+    858.5, -23, 920.125,
+};
+
+static float boss_position[] = { 110.125, 677.5, 472.125 };
+
+#define NUM_WEAK_ENEMIES    (sizeof(weak_enemies) / sizeof(char*)) 
+#define NUM_AVG_ENEMIES     (sizeof(avg_enemies) / sizeof(char*))
+#define NUM_STRONG_ENEMIES  (sizeof(strong_enemies) / sizeof(char*)) 
+#define NUM_BOSS_ENEMIES    (sizeof(boss_enemies) / sizeof(char*))
+#define NUM_POSITIONS       (sizeof(positions) / sizeof(positions[0]) / 3)
 
 void spawn(void)
 {
-    int n = sizeof(positions) / sizeof(positions[0]) / 3;
-    int idx = rand() % n;
-    edict_t* new_ent = G_Spawn();
-    new_ent->classname = "monster_gladiator";
-    new_ent->s.origin[0] = positions[3*idx];
-    new_ent->s.origin[1] = positions[3*idx+1];
-    new_ent->s.origin[2] = positions[3*idx+2];
+    float p;
+    char* name;
+    int pos_idx;
+    edict_t* new_ent;
+
+    p = (float) rand() / RAND_MAX;
+    if (p < 0.7)
+        name = weak_enemies[rand() % NUM_WEAK_ENEMIES];
+    else if (p < 0.9)
+        name = avg_enemies[rand() % NUM_AVG_ENEMIES];
+    else
+        name = strong_enemies[rand() % NUM_STRONG_ENEMIES];
+
+    pos_idx = rand() % NUM_POSITIONS;
+    new_ent = G_Spawn();
+
+    new_ent->classname = name;
+    new_ent->s.origin[0] = positions[3*pos_idx];
+    new_ent->s.origin[1] = positions[3*pos_idx+1];
+    new_ent->s.origin[2] = positions[3*pos_idx+2];
     ED_CallSpawn(new_ent);
+}
+
+void spawn_boss(void)
+{
+    edict_t* new_ent;
+    new_ent = G_Spawn();
+    new_ent->classname = boss_enemies[rand() % NUM_BOSS_ENEMIES];
+    new_ent->s.origin[0] = boss_position[0];
+    new_ent->s.origin[1] = boss_position[1];
+    new_ent->s.origin[2] = boss_position[1];
+    ED_CallSpawn(new_ent);
+}
+
+void final_die(int amt)
+{
+    final_context.currency += amt;
 }
 
 void final_init(void)
 {
-    final_context.wave = 0;
+    final_context.wave = 1;
     final_context.next_wave_time = level.time;
+    final_context.currency = 0;
     final_context.started = 1;
 }
 
@@ -118,8 +188,14 @@ void final_update(void)
 {
     if (!final_context.started) return;
     if (level.time >= final_context.next_wave_time) {
-        spawn();
-        final_context.next_wave_time = level.time + 5;
+        for (int i = 0; i < 5 + final_context.wave; i++) {
+            if (final_context.wave % 10 == 0)
+                spawn_boss();
+            else
+                spawn();
+        }
+        final_context.wave++;
+        final_context.next_wave_time = level.time + 15;
     }
 }
 

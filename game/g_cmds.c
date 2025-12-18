@@ -877,6 +877,19 @@ void Cmd_Cast_f(edict_t *ent)
     fire_bfg(ent, ent->s.origin, dir, 100, 100, 25);
 }
 
+// speed, health, dmg
+struct {
+    float speed;
+    int health;
+    float mult;
+} stats[] = {
+    {0.5, 200, 0.75},
+    {1.0, 150, 1.0},
+    {1.2, 125, 1.25},
+    {1.5, 100, 2.0},
+    {2.5, 50, 40.0},
+};
+
 void Cmd_Class_f(edict_t *ent)
 {
     char* name;
@@ -899,9 +912,37 @@ void Cmd_Class_f(edict_t *ent)
 
 	if (Q_stricmp(name, "tank") == 0) {
         ent->client->pers.inventory[ITEM_INDEX(FindItem("chaingun"))]++;
-        //Add_Ammo(ent, FindItem("bullets"), 30);
         ent->client->pers.inventory[ITEM_INDEX(FindItem("bullets"))] = 60;
-    } else {
+        ent->speed = stats[0].speed;
+        ent->health =ent->max_health = stats[0].health;
+        final_context.mult = stats[0].mult;
+    }
+    else if (Q_stricmp(name, "scout") == 0) {
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("shotgun"))]++;
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("shells"))] = 60;
+        ent->speed = stats[1].speed;
+        ent->health =ent->max_health = stats[1].health;
+        final_context.mult = stats[1].mult;
+    }
+    else if (Q_stricmp(name, "gunner") == 0) {
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("machinegun"))]++;
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("bullets"))] = 60;
+        ent->speed = stats[2].speed;
+        ent->health =ent->max_health = stats[2].health;
+        final_context.mult = stats[2].mult;
+    }
+    else if (Q_stricmp(name, "sniper") == 0) {
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("railgun"))]++;
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("slugs"))] = 60;
+        ent->speed = stats[3].speed;
+        ent->health =ent->max_health = stats[3].health;
+        final_context.mult = stats[3].mult;
+    }
+    else if (Q_stricmp(name, "assassin") == 0) {
+        ent->client->pers.inventory[ITEM_INDEX(FindItem("blaster"))]++;
+        ent->speed = stats[4].speed;
+        ent->health = ent->max_health = stats[4].health;
+        final_context.mult = stats[4].mult;
     }
 }
 
@@ -933,6 +974,26 @@ void Cmd_PlayerList_f(edict_t *ent)
 		strcat(text, st);
 	}
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
+}
+
+void Cmd_Buy_f(edict_t* ent)
+{
+    //if (final_content.currency <= 0)
+    //    return;
+	char* name = gi.args();
+	if (Q_stricmp(name, "speed") == 0) {
+        final_context.player_ent->speed += 1.0;
+        final_context.currency -= 1;
+    }
+    else if (Q_stricmp(name, "health") == 0) {
+        final_context.player_ent->health += 10;
+        final_context.player_ent->max_health += 10;
+        final_context.currency -= 1;
+    }
+    else if (Q_stricmp(name, "damage") == 0) {
+        final_context.mult += 0.1;
+        final_context.currency -= 1;
+    }
 }
 void Cmd_Pos_f(edict_t* ent)
 {
@@ -1058,6 +1119,10 @@ void ClientCommand (edict_t *ent)
         Cmd_Pos_f(ent);
     else if (Q_stricmp(cmd, "spawn") == 0)
         spawn_FFFFF(ent);
+    else if (Q_stricmp(cmd, "skip") == 0)
+        final_context.next_wave_time = level.time;
+    else if (Q_stricmp(cmd, "buy") == 0)
+        Cmd_Buy_f(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }

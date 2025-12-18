@@ -535,6 +535,8 @@ void boss2_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 	self->takedamage = DAMAGE_YES;
 	self->monsterinfo.currentmove = &boss2_move_death;
 #endif
+
+    final_die(20);
 }
 
 qboolean Boss2_CheckAttack (edict_t *self)

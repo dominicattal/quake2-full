@@ -519,8 +519,12 @@ struct {
     int wave;
     float next_wave_time; //level.time
     edict_t* player_ent;
+    int currency;
+    float mult;
 } final_context;
-extern void final_init(void);
+void final_init(void);
+void final_die(int amt);
+void final_set_class(char* name);
 // END
 
 extern	cvar_t	*maxentities;
